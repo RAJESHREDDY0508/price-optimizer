@@ -14,11 +14,9 @@ A minimal, production-style price optimization service you can run with Docker C
 
 ```mermaid
 flowchart LR
-  U[User Browser] -->|HTTP :5001| FE[Frontend (Flask)]
-  FE -->|POST /price| API[Pricing API (FastAPI)]
-  API -->|GET/SET| R[(Redis)]
-  API -->|SQL| PG[(Postgres)]
-  API --> M[Model Logic]
-  M -. future: MLflow registry .-> API
+  U[User] --> FE[Frontend (Flask)]
+  FE --> API[Pricing API (FastAPI)]
+  API --> R[(Redis)]
+  API --> PG[(Postgres)]
 ...diagram...
 
