@@ -1,0 +1,12 @@
+services:
+  pricing-api:
+    build: ./services/pricing-api
+    ports:
+      - "5000:5000"
+
+  frontend:
+    build: ./services/frontend
+    ports:
+      - "5001:5001"
+    depends_on:
+      - pricing-api
