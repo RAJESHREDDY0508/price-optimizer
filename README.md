@@ -18,5 +18,7 @@ flowchart LR
   FE -->|POST /price| API[Pricing API (FastAPI)]
   API -->|GET/SET| R[(Redis)]
   API -->|SQL| PG[(Postgres)]
-  API -->|Model wrapper| M[Dummy model (replace with MLflow)]
+  API --> M[Model Logic]
+  M -. future: MLflow registry .-> API
+...diagram...
 
