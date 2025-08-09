@@ -13,6 +13,9 @@ A minimal, production-style price optimization service you can run with Docker C
 
 ```mermaid
 flowchart LR
-A[User] --> B[Frontend (Flask)]; B --> C[Pricing API (FastAPI)]; C --> D[(Redis)]; C --> E[(Postgres)];
+  A[User] --> B[Frontend (Flask)]
+  B --> C[Pricing API (FastAPI)]
+  C --> D[(Redis)]
+  C --> E[(Postgres)]
 ```
 
