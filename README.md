@@ -9,8 +9,7 @@ A minimal, production-style price optimization service you can run with Docker C
 > This is an MVP blueprint designed to be extended with real models, MLflow, Airflow/Prefect, and Kubernetes later.
 
 ---
-
-## 🧭 Architecture
+## 🔄 System Architecture
 
 ```mermaid
 flowchart LR
@@ -20,5 +19,4 @@ flowchart LR
   API -->|SQL| PG[(Postgres)]
   API --> M[Model Logic]
   M -. future: MLflow registry .-> API
-...diagram...
 
