@@ -1,18 +1,108 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dynamic Price Optimizer</title>
+    <meta charset="UTF-8">
+    <title>Dynamic E-Commerce Price Optimizer</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #e0f7fa 0%, #fce4ec 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .container {
+            background-color: rgba(255,255,255,0.95);
+            width: 90%;
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h1 { text-align: center; margin-top: 0; color: #333; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input { width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { margin-top: 15px; width: 100%; padding: 10px; background-color: #1976d2; color: #fff; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        button:hover { background-color: #115293; }
+        #report { margin-top: 20px; }
+    </style>
 </head>
 <body>
+<div class="container">
     <h1>Dynamic E-Commerce Price Optimizer</h1>
-    <form method="POST">
-        Base Price: <input type="number" step="0.01" name="base_price" required><br>
-        Demand Factor: <input type="number" step="0.01" name="demand_factor" required><br>
-        Competitor Price: <input type="number" step="0.01" name="competitor_price" required><br>
-        <button type="submit">Optimize</button>
+    <form id="priceForm">
+        <label for="sku">SKU</label>
+        <input type="text" id="sku" name="sku" value="SKU123" required>
+        <label for="competitor_price">Competitor Price</label>
+        <input type="number" id="competitor_price" step="0.01" min="0" required>
+        <button type="submit">Optimize Price</button>
     </form>
-    {% if optimized_price is not none %}
-    <h2>Optimized Price: {{ optimized_price }}</h2>
-    {% endif %}
+    <div id="report" style="display:none;">
+        <h2>Price Analysis Report</h2>
+        <p><strong>Optimized Price:</strong> <span id="optimizedPrice"></span></p>
+        <p id="analysisText"></p>
+        <canvas id="priceChart" width="400" height="200"></canvas>
+    </div>
+</div>
+<script>
+document.getElementById('priceForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const sku = document.getElementById('sku').value;
+    const competitorPrice = document.getElementById('competitor_price').value;
+    try {
+        const response = await fetch(`/price?sku=${encodeURIComponent(sku)}&competitor_price=${encodeURIComponent(competitorPrice)}`);
+        if (!response.ok) {
+            const msg = await response.text();
+            throw new Error(msg);
+        }
+        const data = await response.json();
+        const optimized = data.price;
+        document.getElementById('optimizedPrice').textContent = optimized.toFixed(2);
+        const diff = optimized - parseFloat(competitorPrice);
+        let analysisMsg;
+        if (!isNaN(diff)) {
+            analysisMsg = diff >= 0 ? 
+              `The optimized price is $${diff.toFixed(2)} higher than the competitor price.` : 
+              `The optimized price is $${Math.abs(diff).toFixed(2)} lower than the competitor price.`;
+        } else {
+            analysisMsg = '';
+        }
+        document.getElementById('analysisText').textContent = analysisMsg;
+        document.getElementById('report').style.display = 'block';
+        const ctx = document.getElementById('priceChart').getContext('2d');
+        if (window.priceChart) {
+            window.priceChart.destroy();
+        }
+        window.priceChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Competitor Price', 'Optimized Price'],
+                datasets: [{
+                    label: 'Price Comparison',
+                    data: [parseFloat(competitorPrice), optimized],
+                    backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)'],
+                    borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        alert('Error optimizing price: ' + error.message);
+    }
+});
+</script>
 </body>
 </html>
